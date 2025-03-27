@@ -1,2 +1,2 @@
-# Intelligent CPU Scheduler Simulator.
-# Intelligent-CPU-Scheduler-Simulator
+# Real-Time-Multi-Threading-Application-Simulator.
+# Real-Time-Multi-Threading-Application-Simulator
