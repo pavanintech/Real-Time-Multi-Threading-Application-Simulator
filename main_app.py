@@ -6,7 +6,6 @@ from PIL import Image, ImageTk
 import matplotlib
 matplotlib.use("TkAgg")  # Set matplotlib backend
 
-# Import modules
 from thread_simulator import ThreadSimulator
 from deadlock_visualizer import DeadlockVisualizer
 
@@ -18,11 +17,9 @@ class MultiThreadingApp(tk.Tk):
         self.geometry("1200x800")
         self.minsize(800, 600)
         
-        # Configure style
         self.style = ttk.Style()
         self.style.theme_use('clam')  # Use clam theme as base
         
-        # Configure colors
         self.style.configure('.',
                             background='white',
                             foreground='black',
@@ -43,48 +40,37 @@ class MultiThreadingApp(tk.Tk):
                             padding=10,
                             width=20)
         
-        # Create main layout
         self.create_layout()
         
-        # Load and display logo
         self.load_logo()
         
-        # Initialize current module
         self.current_module = None
         
     def create_layout(self):
-        # Main container
         self.main_container = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
         self.main_container.pack(fill=tk.BOTH, expand=True)
         
-        # Navigation panel (left)
         self.nav_panel = ttk.Frame(self.main_container, width=220)
         self.main_container.add(self.nav_panel, weight=0)
         
-        # Content area (right)
         self.content_area = ttk.Frame(self.main_container)
         self.main_container.add(self.content_area, weight=1)
         
-        # Configure navigation panel
         self.setup_navigation()
         
     def setup_navigation(self):
-        # Navigation heading
         nav_heading = ttk.Label(self.nav_panel, text="MODULES", style='Heading.TLabel')
         nav_heading.pack(pady=(20, 10), padx=10, anchor=tk.W)
         
-        # Separator
         separator = ttk.Separator(self.nav_panel, orient=tk.HORIZONTAL)
         separator.pack(fill=tk.X, padx=10, pady=5)
         
-        # Thread Simulator button
         thread_btn = ttk.Button(self.nav_panel, 
                                text="Thread Simulator", 
                                style='Nav.TButton',
                                command=lambda: self.show_module("thread"))
         thread_btn.pack(pady=5, padx=10, fill=tk.X)
         
-        # Deadlock Visualizer button
         deadlock_btn = ttk.Button(self.nav_panel, 
                                  text="Deadlock Visualizer", 
                                  style='Nav.TButton',
@@ -92,7 +78,6 @@ class MultiThreadingApp(tk.Tk):
         deadlock_btn.pack(pady=5, padx=10, fill=tk.X)
         
     def load_logo(self):
-        # Create a canvas for the logo
         self.logo_canvas = tk.Canvas(self.content_area, bg='white', highlightthickness=0)
         self.logo_canvas.pack(fill=tk.BOTH, expand=True)
         

@@ -13,40 +13,34 @@ class ThreadSimulator:
         self.parent = parent
         self.frame = ttk.Frame(parent)
         
-        # Thread simulation variables
         self.num_threads = tk.IntVar(value=4)
         self.num_tasks = tk.IntVar(value=20)
         self.task_queue = queue.Queue()
         self.threads = []
         self.running = False
-        self.thread_status = {}  # To track thread status
-        self.thread_history = {}  # To track thread history for visualization
+        self.thread_status = {}
+        self.thread_history = {}
         self.start_time = 0
         
-        # Create UI components
         self.create_control_panel()
         self.create_visualization_area()
         
     def create_control_panel(self):
-        # Control panel frame
         control_frame = ttk.Frame(self.frame, padding=10)
         control_frame.pack(fill=tk.X, padx=10, pady=10)
         
-        # Thread configuration
         thread_label = ttk.Label(control_frame, text="Worker Threads:")
         thread_label.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
         
         thread_spinbox = ttk.Spinbox(control_frame, from_=1, to=16, textvariable=self.num_threads, width=5)
         thread_spinbox.grid(row=0, column=1, padx=5, pady=5, sticky=tk.W)
         
-        # Task configuration
         task_label = ttk.Label(control_frame, text="Tasks:")
         task_label.grid(row=0, column=2, padx=5, pady=5, sticky=tk.W)
         
         task_spinbox = ttk.Spinbox(control_frame, from_=1, to=100, textvariable=self.num_tasks, width=5)
         task_spinbox.grid(row=0, column=3, padx=5, pady=5, sticky=tk.W)
         
-        # Control buttons
         self.start_button = ttk.Button(control_frame, text="Start", command=self.start_simulation)
         self.start_button.grid(row=0, column=4, padx=5, pady=5)
         
@@ -57,11 +51,9 @@ class ThreadSimulator:
         self.clear_button.grid(row=0, column=6, padx=5, pady=5)
         
     def create_visualization_area(self):
-        # Visualization frame
         viz_frame = ttk.Frame(self.frame, padding=10)
         viz_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
-        # Timeline visualization (Matplotlib)
         timeline_frame = ttk.LabelFrame(viz_frame, text="Thread Activity Timeline", padding=10)
         timeline_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
@@ -70,14 +62,11 @@ class ThreadSimulator:
         self.canvas = FigureCanvasTkAgg(self.fig, master=timeline_frame)
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
         
-        # Initialize empty plot
         self.update_timeline()
         
-        # Progress frame
         progress_frame = ttk.Frame(viz_frame, padding=10)
         progress_frame.pack(fill=tk.X, padx=5, pady=5)
         
-        # Overall progress bar
         progress_label = ttk.Label(progress_frame, text="Overall Progress:")
         progress_label.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
         
@@ -87,7 +76,6 @@ class ThreadSimulator:
         
         progress_frame.columnconfigure(1, weight=1)
         
-        # Status text area
         status_frame = ttk.LabelFrame(viz_frame, text="Status Updates", padding=10)
         status_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
