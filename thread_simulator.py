@@ -86,7 +86,7 @@ class ThreadSimulator:
         scrollbar.pack(fill=tk.Y, side=tk.RIGHT)
         self.status_text.config(yscrollcommand=scrollbar.set)
         
-        # Make text read-only
+        
         self.status_text.config(state=tk.DISABLED)
         
     def update_timeline(self):
@@ -98,7 +98,7 @@ class ThreadSimulator:
                         horizontalalignment='center', verticalalignment='center',
                         transform=self.ax.transAxes)
         else:
-            # Plot thread activity
+            
             current_time = time.time() - self.start_time
             
             y_ticks = []
@@ -109,14 +109,14 @@ class ThreadSimulator:
                 y_ticks.append(y_pos)
                 y_labels.append(f"Thread {thread_id}")
                 
-                # Plot active periods
+                
                 for start, end, task_id in events:
-                    if end is None:  # Still active
+                    if end is None:  
                         end = current_time
                     self.ax.barh(y_pos, end - start, left=start, height=0.5, 
                                 color='#2980B9', alpha=0.7)
                     
-                    # Add task label if there's enough space
+                    
                     if end - start > 0.3:
                         self.ax.text(start + (end - start) / 2, y_pos, f"Task {task_id}",
                                     ha='center', va='center', color='white', fontsize=8)
@@ -127,7 +127,7 @@ class ThreadSimulator:
             self.ax.set_title("Thread Activity Timeline")
             self.ax.grid(True, axis='x', linestyle='--', alpha=0.7)
             
-            # Set x-axis limits
+            
             self.ax.set_xlim(0, max(current_time, 1))
         
         self.canvas.draw()
@@ -144,92 +144,91 @@ class ThreadSimulator:
         
         while self.running:
             try:
-                # Get task with timeout to allow thread to check if simulation is still running
+                
                 task_id = self.task_queue.get(timeout=0.1)
                 
-                # Log start of task
+                
                 self.log_status(f"Thread {thread_id} started task {task_id}")
                 self.thread_status[thread_id] = f"processing task {task_id}"
                 
-                # Record start time
+                
                 start_time = time.time() - self.start_time
                 
-                # Simulate work (random duration between 0.5 and 2 seconds)
+                
                 work_duration = random.uniform(0.5, 2.0)
                 time.sleep(work_duration)
                 
-                # Record end time
+                
                 end_time = time.time() - self.start_time
                 
-                # Add to history
+                
                 self.thread_history[thread_id].append((start_time, end_time, task_id))
                 
-                # Log completion
+                
                 self.log_status(f"Thread {thread_id} completed task {task_id}")
                 self.thread_status[thread_id] = "idle"
                 
-                # Mark task as done
+                
                 self.task_queue.task_done()
                 
-                # Update progress
+                
                 completed = self.num_tasks.get() - self.task_queue.qsize()
                 progress = completed / self.num_tasks.get()
                 self.progress_var.set(progress)
                 
             except queue.Empty:
-                # No tasks available, continue checking
+                
                 pass
             
-            # Update visualization periodically
-            if thread_id == 0:  # Only one thread should update the UI
+            if thread_id == 0:  
                 self.update_ui()
                 
     def update_ui(self):
-        # This method is called from the worker thread
-        # We need to use after() to update the UI from the main thread
+        
+        
         self.frame.after(100, self.update_timeline)
         
     def start_simulation(self):
         if self.running:
             return
             
-        # Reset simulation
+        
         self.clear_simulation()
         
-        # Update UI
+        
         self.start_button.config(state=tk.DISABLED)
         self.stop_button.config(state=tk.NORMAL)
         self.running = True
         
-        # Record start time
+        
         self.start_time = time.time()
         
-        # Create tasks
+        
         for i in range(self.num_tasks.get()):
             self.task_queue.put(i)
             
-        # Log start
+        
         self.log_status(f"Starting simulation with {self.num_threads.get()} threads and {self.num_tasks.get()} tasks")
         
-        # Create and start worker threads
+        
         for i in range(self.num_threads.get()):
             thread = threading.Thread(target=self.worker_thread, args=(i,), daemon=True)
             self.threads.append(thread)
             thread.start()
             self.log_status(f"Started worker thread {i}")
             
-        # Start a monitoring thread to update progress and check for completion
+        
         self.monitor_thread = threading.Thread(target=self.monitor_simulation, daemon=True)
         self.monitor_thread.start()
         
     def monitor_simulation(self):
         while self.running and any(thread.is_alive() for thread in self.threads):
-            # Check if all tasks are done
+            
             if self.task_queue.empty() and all(status == "idle" for status in self.thread_status.values()):
                 self.frame.after(0, self.simulation_complete)
                 break
                 
-            # Sleep briefly
+            
             time.sleep(0.1)
             
     def simulation_complete(self):
@@ -246,40 +245,40 @@ class ThreadSimulator:
             
         self.running = False
         
-        # Wait for threads to finish
+        
         for thread in self.threads:
             if thread.is_alive():
                 thread.join(0.1)
                 
-        # Update UI
+        
         self.start_button.config(state=tk.NORMAL)
         self.stop_button.config(state=tk.DISABLED)
         
-        # Log stop
+        
         self.log_status("Simulation stopped")
         
-        # Final UI update
+        
         self.update_timeline()
         
     def clear_simulation(self):
-        # Stop simulation if running
+        
         if self.running:
             self.stop_simulation()
             
-        # Clear data
+        
         self.threads = []
         self.thread_status = {}
         self.thread_history = {}
         self.task_queue = queue.Queue()
         self.progress_var.set(0.0)
         
-        # Clear status text
+        
         self.status_text.config(state=tk.NORMAL)
         self.status_text.delete(1.0, tk.END)
         self.status_text.config(state=tk.DISABLED)
         
-        # Reset timeline
+        
         self.update_timeline()
         
-        # Log clear
+        
         self.log_status("Simulation cleared")
